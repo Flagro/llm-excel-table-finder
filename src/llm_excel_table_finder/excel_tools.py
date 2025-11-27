@@ -8,6 +8,7 @@ from enum import Enum
 
 class Direction(str, Enum):
     """Direction for cell iteration."""
+
     UP = "up"
     DOWN = "down"
     LEFT = "left"
@@ -17,6 +18,7 @@ class Direction(str, Enum):
 @dataclass
 class CellData:
     """Data structure for cell information."""
+
     address: str
     value: Any
     formatting: Dict[str, Any]
@@ -25,6 +27,7 @@ class CellData:
 @dataclass
 class CellRange:
     """Data structure for cell range."""
+
     start_col: int  # 0-indexed
     start_row: int  # 0-indexed
     end_col: int  # 0-indexed
@@ -41,7 +44,7 @@ class CellRange:
         """Convert column index to Excel letter (0 -> A, 1 -> B, etc.)."""
         result = ""
         while col >= 0:
-            result = chr(col % 26 + ord('A')) + result
+            result = chr(col % 26 + ord("A")) + result
             col = col // 26 - 1
         return result
 
@@ -52,11 +55,11 @@ class CellRange:
             # Single cell
             col, row = cls._parse_cell_address(notation)
             return cls(col, row, col, row)
-        
+
         start_cell, end_cell = notation.split(":")
         start_col, start_row = cls._parse_cell_address(start_cell)
         end_col, end_row = cls._parse_cell_address(end_cell)
-        
+
         return cls(start_col, start_row, end_col, end_row)
 
     @staticmethod
@@ -64,21 +67,21 @@ class CellRange:
         """Parse cell address like 'A3' into (col_idx, row_idx)."""
         col_letters = ""
         row_digits = ""
-        
+
         for char in address:
             if char.isalpha():
                 col_letters += char.upper()
             elif char.isdigit():
                 row_digits += char
-        
+
         # Convert column letters to index
         col_idx = 0
         for char in col_letters:
-            col_idx = col_idx * 26 + (ord(char) - ord('A') + 1)
+            col_idx = col_idx * 26 + (ord(char) - ord("A") + 1)
         col_idx -= 1  # Convert to 0-indexed
-        
+
         row_idx = int(row_digits) - 1  # Convert to 0-indexed
-        
+
         return col_idx, row_idx
 
 
@@ -98,10 +101,10 @@ class ExcelReaderBase(ABC):
     def get_sheet_bounds(self, sheet_name: str) -> str:
         """
         Get the used range of a sheet in Excel notation.
-        
+
         Args:
             sheet_name: Name of the sheet
-            
+
         Returns:
             Range in Excel notation (e.g., "A1:Z100")
         """
@@ -111,11 +114,11 @@ class ExcelReaderBase(ABC):
     def get_cells_in_range(self, sheet_name: str, range_notation: str) -> List[CellData]:
         """
         Get cells with values and formatting in the specified range.
-        
+
         Args:
             sheet_name: Name of the sheet
             range_notation: Range in Excel notation (e.g., "A3:C10")
-            
+
         Returns:
             List of CellData objects
         """
@@ -123,19 +126,16 @@ class ExcelReaderBase(ABC):
 
     @abstractmethod
     def iterate_until_empty(
-        self, 
-        sheet_name: str, 
-        start_cell: str, 
-        direction: Direction
+        self, sheet_name: str, start_cell: str, direction: Direction
     ) -> List[CellData]:
         """
         Iterate from a cell in a direction until an empty cell is found.
-        
+
         Args:
             sheet_name: Name of the sheet
             start_cell: Starting cell in Excel notation (e.g., "A3")
             direction: Direction to iterate (up, down, left, right)
-            
+
         Returns:
             List of CellData objects encountered (excluding the empty cell)
         """
@@ -153,4 +153,3 @@ class ExcelReaderBase(ABC):
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Context manager exit."""
         self.close()
-
