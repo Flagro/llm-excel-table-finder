@@ -44,49 +44,18 @@ You need to set your OpenAI API key:
 export OPENAI_API_KEY='your-api-key-here'
 ```
 
-## Implementation Required
+## Supported File Formats
 
-⚠️ **Important**: The Excel reader implementations are not included. You need to implement subclasses of `ExcelReaderBase` for `.xlsx` and `.xls` files.
+The package includes built-in support for:
 
-### Implementing Excel Readers
+- **`.xlsx` files**: Using `openpyxl` (automatically installed)
+- **`.xls` files**: Using `xlrd` (automatically installed)
 
-1. Create a class that inherits from `ExcelReaderBase`:
-
-```python
-from llm_excel_table_finder import ExcelReaderBase, CellData, Direction
-
-class XLSXReader(ExcelReaderBase):
-    def __init__(self, file_path: str):
-        super().__init__(file_path)
-        # Initialize your xlsx library (e.g., openpyxl)
-        
-    def get_sheet_names(self) -> List[str]:
-        # Return list of sheet names
-        pass
-        
-    def get_sheet_bounds(self, sheet_name: str) -> str:
-        # Return range like "A1:Z100"
-        pass
-        
-    def get_cells_in_range(self, sheet_name: str, range_notation: str) -> List[CellData]:
-        # Return list of CellData objects
-        pass
-        
-    def iterate_until_empty(self, sheet_name: str, start_cell: str, direction: Direction) -> List[CellData]:
-        # Iterate in direction until empty cell
-        pass
-        
-    def close(self):
-        # Clean up resources
-        pass
-```
-
-2. Update `src/cli.py` in the `get_excel_reader()` function to use your implementation.
-
-### Suggested Libraries
-
-- For `.xlsx` files: `openpyxl` or `xlsxwriter`
-- For `.xls` files: `xlrd`
+Both implementations provide:
+- Cell value extraction
+- Formatting information (bold, italic, colors, borders, etc.)
+- Sheet navigation and bounds detection
+- Directional iteration until empty cells
 
 ## Usage
 
@@ -112,11 +81,14 @@ excel-table-finder myfile.xlsx --model gpt-4
 ### Python API
 
 ```python
-from llm_excel_table_finder import ExcelTableFinderAgent
-from your_module import XLSXReader  # Your implementation
+from src.agent import ExcelTableFinderAgent
+from src.excel_tools import OpenpyxlReader, XlrdReader
 
-# Create reader
-reader = XLSXReader("myfile.xlsx")
+# Create reader for .xlsx files
+reader = OpenpyxlReader("myfile.xlsx")
+
+# Or for .xls files
+# reader = XlrdReader("myfile.xls")
 
 # Create agent
 agent = ExcelTableFinderAgent(

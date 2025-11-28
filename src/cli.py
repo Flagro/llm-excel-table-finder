@@ -7,30 +7,29 @@ from typing import Optional
 import click
 
 from src.agent import ExcelTableFinderAgent
+from src.excel_tools import OpenpyxlReader, XlrdReader
 
 
 def get_excel_reader(file_path: str):
     """
     Get the appropriate Excel reader based on file extension.
 
-    This is a placeholder that will raise an error since implementations
-    are not yet available. Users should implement their own ExcelReaderBase
-    subclasses for .xlsx and .xls files.
+    Args:
+        file_path: Path to the Excel file
+
+    Returns:
+        ExcelReaderBase instance (OpenpyxlReader for .xlsx, XlrdReader for .xls)
+
+    Raises:
+        ValueError: If file extension is not supported
+        ImportError: If required package is not installed
     """
     file_ext = Path(file_path).suffix.lower()
 
     if file_ext == ".xlsx":
-        # Placeholder for future implementation
-        raise NotImplementedError(
-            "XLSX reader not yet implemented. Please implement a subclass of "
-            "ExcelReaderBase for .xlsx files."
-        )
+        return OpenpyxlReader(file_path)
     elif file_ext == ".xls":
-        # Placeholder for future implementation
-        raise NotImplementedError(
-            "XLS reader not yet implemented. Please implement a subclass of "
-            "ExcelReaderBase for .xls files."
-        )
+        return XlrdReader(file_path)
     else:
         raise ValueError(f"Unsupported file extension: {file_ext}. Supported: .xlsx, .xls")
 
@@ -73,7 +72,7 @@ def export_to_csv(tables, excel_reader, output_path: Optional[str] = None):
         cells = excel_reader.get_cells_in_range(table.sheet_name, full_range)
 
         # Organize cells into rows
-        from llm_excel_table_finder.excel_tools import CellRange
+        from src.excel_tools import CellRange
 
         range_obj = CellRange.from_excel_notation(full_range)
 
@@ -183,18 +182,13 @@ def main(
         # Close the reader
         excel_reader.close()
 
-    except NotImplementedError as e:
+    except ImportError as e:
         click.echo(f"Error: {e}", err=True)
-        click.echo(
-            "\nTo use this tool, you need to implement ExcelReaderBase subclasses:", err=True
-        )
-        click.echo("1. Create a class that inherits from ExcelReaderBase", err=True)
-        click.echo(
-            "2. Implement all abstract methods (get_sheet_names, get_sheet_bounds, etc.)", err=True
-        )
-        click.echo(
-            "3. Update the get_excel_reader function in cli.py to use your implementation", err=True
-        )
+        click.echo("\nPlease install the required package:", err=True)
+        if "openpyxl" in str(e):
+            click.echo("  pip install openpyxl", err=True)
+        elif "xlrd" in str(e):
+            click.echo("  pip install xlrd", err=True)
         sys.exit(1)
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
