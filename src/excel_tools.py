@@ -1,7 +1,7 @@
 """Abstract base class and tools for Excel operations."""
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
 

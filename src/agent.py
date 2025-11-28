@@ -10,7 +10,11 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, ToolMe
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 
-from llm_excel_table_finder.excel_tools import ExcelReaderBase, Direction
+from src.excel_tools import ExcelReaderBase, Direction
+from src.prompts import (
+    get_table_finding_prompt,
+    get_structured_output_prompt,
+)
 
 
 # Structured output models
@@ -231,57 +235,7 @@ class ExcelTableFinderAgent:
             TablesOutput or TablesWithHeadersOutput depending on include_headers flag
         """
         # Create the initial prompt
-        if self.include_headers:
-            prompt = f"""You are an expert at analyzing Excel spreadsheets to find tables.
-
-Your task is to find all tables in the following sheets: {', '.join(self.sheet_names)}
-
-For each table you find, you must identify:
-1. The complete range including headers (in Excel notation like A3:C10)
-2. The header row values (list of column names)
-3. The data range (excluding the header row)
-
-A table typically has:
-- A header row with column names (often bold or with different formatting)
-- Multiple rows of data below the headers
-- Consistent structure across rows
-- Empty cells or different content around its boundaries
-
-Use the available tools to:
-1. Get the bounds of each sheet to understand the data area
-2. Get cells in ranges to see values and formatting
-3. Iterate in directions to find table boundaries
-
-After analyzing the sheets, provide your findings as structured output with:
-- Sheet name
-- List of header names
-- Header range (e.g., A1:C1)
-- Data range (e.g., A2:C10)
-- Optional description
-
-Be thorough and find all tables, even small ones."""
-        else:
-            prompt = f"""You are an expert at analyzing Excel spreadsheets to find tables.
-
-Your task is to find all tables in the following sheets: {', '.join(self.sheet_names)}
-
-A table is a rectangular region of cells that contains structured data, typically with:
-- A header row (often with bold formatting or different styling)
-- Multiple rows of data
-- Consistent columns
-- Empty cells or different content around its boundaries
-
-Use the available tools to:
-1. Get the bounds of each sheet to understand the data area
-2. Get cells in ranges to see values and formatting
-3. Iterate in directions to find table boundaries
-
-After analyzing the sheets, provide your findings as structured output with:
-- Sheet name
-- Range in Excel notation (e.g., A3:C10)
-- Optional description of what the table contains
-
-Be thorough and find all tables, even small ones."""
+        prompt = get_table_finding_prompt(self.sheet_names, self.include_headers)
 
         # Initialize state
         initial_state: AgentState = {
@@ -300,31 +254,15 @@ Be thorough and find all tables, even small ones."""
         # Use structured output to parse the response
         if self.include_headers:
             structured_llm = self.llm.with_structured_output(TablesWithHeadersOutput)
-            result = structured_llm.invoke(
-                [
-                    HumanMessage(
-                        content=f"""Based on your analysis, extract all found tables with their headers.
-                
-Previous conversation:
-{last_message.content}
-
-Provide the structured output with all tables you found."""
-                    )
-                ]
-            )
         else:
             structured_llm = self.llm.with_structured_output(TablesOutput)
-            result = structured_llm.invoke(
-                [
-                    HumanMessage(
-                        content=f"""Based on your analysis, extract all found table ranges.
-                
-Previous conversation:
-{last_message.content}
 
-Provide the structured output with all table ranges you found."""
-                    )
-                ]
-            )
+        result = structured_llm.invoke(
+            [
+                HumanMessage(
+                    content=get_structured_output_prompt(last_message.content, self.include_headers)
+                )
+            ]
+        )
 
         return result

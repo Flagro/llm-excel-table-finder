@@ -3,10 +3,10 @@
 import json
 import sys
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 import click
 
-from llm_excel_table_finder.agent import ExcelTableFinderAgent
+from src.agent import ExcelTableFinderAgent
 
 
 def get_excel_reader(file_path: str):

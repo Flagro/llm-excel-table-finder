@@ -1,12 +1,12 @@
 """LLM Excel Table Finder - A LangGraph ReAct agent for finding tables in Excel files."""
 
-from llm_excel_table_finder.excel_tools import (
+from src.excel_tools import (
     ExcelReaderBase,
     CellData,
     CellRange,
     Direction,
 )
-from llm_excel_table_finder.agent import (
+from src.agent import (
     ExcelTableFinderAgent,
     TableRange,
     TableWithHeaders,
