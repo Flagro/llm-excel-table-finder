@@ -98,10 +98,10 @@ class OpenpyxlReader(ExcelReaderBase):
             col += delta_col
             row += delta_row
 
-            # Check bounds
+            # Check bounds (col/row are 0-indexed, max_column/max_row are 1-indexed)
             if col < 0 or row < 0:
                 break
-            if col >= sheet.max_column or row >= sheet.max_row:
+            if col + 1 > sheet.max_column or row + 1 > sheet.max_row:
                 break
 
         return cells

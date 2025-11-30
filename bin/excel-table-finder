@@ -7,7 +7,7 @@ It can be used when installing via pip with the --editable flag or traditional i
 """
 
 import sys
-from llm_excel_table_finder.cli import main
+from src.cli import main
 
 if __name__ == "__main__":
     sys.exit(main())

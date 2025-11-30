@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.scripts]
-excel-table-finder = "llm_excel_table_finder.cli:main"
+excel-table-finder = "src.cli:main"
 
 [project.optional-dependencies]
 dev = [
