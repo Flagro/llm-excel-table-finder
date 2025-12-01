@@ -2,7 +2,7 @@
 
 from typing import List, Dict, Any
 
-from .base import ExcelReaderBase, CellData, CellRange, Direction
+from src.excel_tools.base import ExcelReaderBase, CellData, CellRange, Direction
 
 
 class XlrdReader(ExcelReaderBase):
