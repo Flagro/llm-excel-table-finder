@@ -13,7 +13,6 @@ class XlrdReader(ExcelReaderBase):
         super().__init__(file_path)
         try:
             import xlrd
-            from xlrd.formatting import Format, XF
         except ImportError:
             raise ImportError("xlrd is required for .xls files. Install it with: pip install xlrd")
 
@@ -36,7 +35,7 @@ class XlrdReader(ExcelReaderBase):
 
         # Convert to Excel notation
         start_cell = "A1"
-        end_cell = CellRange._to_column_letter(max_col - 1) + str(max_row)
+        end_cell = CellRange.to_column_letter(max_col - 1) + str(max_row)
 
         return f"{start_cell}:{end_cell}"
 
@@ -49,7 +48,7 @@ class XlrdReader(ExcelReaderBase):
         for row in range(cell_range.start_row, min(cell_range.end_row + 1, sheet.nrows)):
             for col in range(cell_range.start_col, min(cell_range.end_col + 1, sheet.ncols)):
                 cell = sheet.cell(row, col)
-                address = CellRange._to_column_letter(col) + str(row + 1)
+                address = CellRange.to_column_letter(col) + str(row + 1)
 
                 # Extract formatting information
                 formatting = self._get_cell_formatting(sheet, row, col)
@@ -94,7 +93,7 @@ class XlrdReader(ExcelReaderBase):
                 break
 
             # Add cell to results
-            address = CellRange._to_column_letter(col) + str(row + 1)
+            address = CellRange.to_column_letter(col) + str(row + 1)
             formatting = self._get_cell_formatting(sheet, row, col)
             cells.append(CellData(address=address, value=value, formatting=formatting))
 

@@ -81,7 +81,7 @@ def export_to_csv(tables, excel_reader, output_path: Optional[str] = None):
             row = []
             for col_idx in range(range_obj.start_col, range_obj.end_col + 1):
                 # Find cell at this position
-                cell_addr = CellRange._to_column_letter(col_idx) + str(row_idx + 1)
+                cell_addr = CellRange.to_column_letter(col_idx) + str(row_idx + 1)
                 cell = next((c for c in cells if c.address == cell_addr), None)
                 row.append(str(cell.value) if cell and cell.value is not None else "")
             rows.append(row)

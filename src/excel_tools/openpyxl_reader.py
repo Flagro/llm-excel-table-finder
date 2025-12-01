@@ -13,7 +13,6 @@ class OpenpyxlReader(ExcelReaderBase):
         super().__init__(file_path)
         try:
             from openpyxl import load_workbook
-            from openpyxl.styles import Font, Fill, Border
         except ImportError:
             raise ImportError(
                 "openpyxl is required for .xlsx files. Install it with: pip install openpyxl"

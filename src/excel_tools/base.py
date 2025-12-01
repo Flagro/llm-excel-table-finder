@@ -35,12 +35,12 @@ class CellRange:
 
     def to_excel_notation(self) -> str:
         """Convert to Excel A1 notation (e.g., A3:C10)."""
-        start = self._to_column_letter(self.start_col) + str(self.start_row + 1)
-        end = self._to_column_letter(self.end_col) + str(self.end_row + 1)
+        start = self.to_column_letter(self.start_col) + str(self.start_row + 1)
+        end = self.to_column_letter(self.end_col) + str(self.end_row + 1)
         return f"{start}:{end}"
 
     @staticmethod
-    def _to_column_letter(col: int) -> str:
+    def to_column_letter(col: int) -> str:
         """Convert column index to Excel letter (0 -> A, 1 -> B, etc.)."""
         result = ""
         while col >= 0:
