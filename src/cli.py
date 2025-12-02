@@ -1,6 +1,7 @@
 """CLI interface for the Excel table finder agent."""
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -149,6 +150,13 @@ def main(
         excel-table-finder myfile.xlsx --include-headers
     """
     try:
+        # Validate OpenAI API key
+        if not os.getenv("OPENAI_API_KEY"):
+            click.echo("Error: OPENAI_API_KEY environment variable is not set.", err=True)
+            click.echo("\nPlease set your OpenAI API key:", err=True)
+            click.echo("  export OPENAI_API_KEY='your-api-key-here'", err=True)
+            sys.exit(1)
+
         # Validate options
         if output and not csv:
             click.echo("Warning: --output is only used with --csv flag", err=True)
