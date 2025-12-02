@@ -5,6 +5,7 @@ from src.excel_tools import (
     CellData,
     CellRange,
     Direction,
+    to_column_letter,
 )
 from src.agent import (
     ExcelTableFinderAgent,
@@ -21,6 +22,7 @@ __all__ = [
     "CellData",
     "CellRange",
     "Direction",
+    "to_column_letter",
     "ExcelTableFinderAgent",
     "TableRange",
     "TableWithHeaders",
