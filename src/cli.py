@@ -8,10 +8,10 @@ from typing import Optional
 import click
 
 from src.agent import ExcelTableFinderAgent
-from src.excel_tools import OpenpyxlReader, XlrdReader
+from src.excel_tools import OpenpyxlReader, XlrdReader, ExcelReaderBase
 
 
-def get_excel_reader(file_path: str):
+def get_excel_reader(file_path: str) -> ExcelReaderBase:
     """
     Get the appropriate Excel reader based on file extension.
 
