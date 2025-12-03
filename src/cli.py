@@ -182,7 +182,11 @@ def main(
         # Handle output
         if csv:
             click.echo(f"Found {len(result.tables)} table(s)")
-            export_to_csv(result, excel_reader, output)
+            try:
+                export_to_csv(result, excel_reader, output)
+            except Exception as e:
+                click.echo(f"Error exporting to CSV: {e}", err=True)
+                sys.exit(1)
         else:
             # Output JSON
             click.echo(json.dumps(result.model_dump(), indent=2))
