@@ -131,8 +131,6 @@ class XlrdReader(ExcelReaderBase):
 
     def _get_cell_formatting(self, sheet, row: int, col: int) -> Dict[str, Any]:
         """Extract formatting information from a cell."""
-        import xlrd
-
         formatting = {}
 
         try:
