@@ -9,6 +9,7 @@ import click
 
 from src.agent import ExcelTableFinderAgent
 from src.excel_tools import OpenpyxlReader, XlrdReader, ExcelReaderBase
+from src.agent import TablesOutput, TablesWithHeadersOutput
 
 
 def get_excel_reader(file_path: str) -> ExcelReaderBase:
@@ -35,7 +36,11 @@ def get_excel_reader(file_path: str) -> ExcelReaderBase:
         raise ValueError(f"Unsupported file extension: {file_ext}. Supported: .xlsx, .xls")
 
 
-def export_to_csv(tables, excel_reader, output_path: Optional[str] = None):
+def export_to_csv(
+    tables: TablesOutput | TablesWithHeadersOutput,
+    excel_reader: ExcelReaderBase,
+    output_path: Optional[str] = None,
+):
     """
     Export found tables to CSV files.
 
