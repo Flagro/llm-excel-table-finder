@@ -3,7 +3,7 @@
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -89,7 +89,7 @@ class ExcelTableFinderAgent:
         self.tools = self._create_tools()
 
         # Create the ReAct agent
-        self.agent = create_react_agent(self.llm, self.tools)
+        self.agent = create_agent(self.llm, self.tools)
 
     def _create_tools(self):
         """Create the tools for the agent."""
@@ -191,5 +191,4 @@ class ExcelTableFinderAgent:
                 )
             ]
         )
-
         return result
