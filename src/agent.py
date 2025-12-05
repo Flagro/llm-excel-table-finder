@@ -1,12 +1,10 @@
 """LangGraph ReAct agent for finding tables in Excel files."""
 
-from typing import List, Optional, Annotated, Literal
-from typing_extensions import TypedDict
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
-from langgraph.graph import StateGraph, END
-from langgraph.prebuilt import ToolNode
-from langchain_core.messages import BaseMessage, HumanMessage
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 
@@ -56,16 +54,6 @@ class TablesWithHeadersOutput(BaseModel):
     )
 
 
-# Agent state
-class AgentState(TypedDict):
-    """State for the table finder agent."""
-
-    messages: Annotated[List[BaseMessage], "The messages in the conversation"]
-    excel_reader: ExcelReaderBase
-    sheet_names: List[str]
-    include_headers: bool
-
-
 class ExcelTableFinderAgent:
     """LangGraph ReAct agent for finding tables in Excel files."""
 
@@ -100,8 +88,8 @@ class ExcelTableFinderAgent:
         # Create tools
         self.tools = self._create_tools()
 
-        # Build the graph
-        self.graph = self._build_graph()
+        # Create the ReAct agent
+        self.agent = create_react_agent(self.llm, self.tools)
 
     def _create_tools(self):
         """Create the tools for the agent."""
@@ -174,59 +162,6 @@ class ExcelTableFinderAgent:
 
         return [get_sheet_bounds, get_cells_in_range, iterate_until_empty]
 
-    def _build_graph(self) -> StateGraph:
-        """Build the LangGraph workflow."""
-
-        # Create the graph
-        workflow = StateGraph(AgentState)
-
-        # Bind tools to LLM
-        llm_with_tools = self.llm.bind_tools(self.tools)
-
-        # Define the agent node
-        def agent_node(state: AgentState):
-            """Agent reasoning node."""
-            messages = state["messages"]
-            response = llm_with_tools.invoke(messages)
-            return {"messages": [response]}
-
-        # Define the tool node
-        tool_node = ToolNode(self.tools)
-
-        # Define routing function
-        def should_continue(state: AgentState) -> Literal["tools", "end"]:
-            """Determine whether to continue or end."""
-            messages = state["messages"]
-            last_message = messages[-1]
-
-            # If the LLM makes a tool call, route to tools
-            if hasattr(last_message, "tool_calls") and last_message.tool_calls:
-                return "tools"
-            # Otherwise, end
-            return "end"
-
-        # Add nodes
-        workflow.add_node("agent", agent_node)
-        workflow.add_node("tools", tool_node)
-
-        # Set entry point
-        workflow.set_entry_point("agent")
-
-        # Add conditional edges
-        workflow.add_conditional_edges(
-            "agent",
-            should_continue,
-            {
-                "tools": "tools",
-                "end": END,
-            },
-        )
-
-        # Add edge from tools back to agent
-        workflow.add_edge("tools", "agent")
-
-        return workflow.compile()
-
     def find_tables(self) -> TablesOutput | TablesWithHeadersOutput:
         """
         Find tables in the Excel file.
@@ -237,16 +172,8 @@ class ExcelTableFinderAgent:
         # Create the initial prompt
         prompt = get_table_finding_prompt(self.sheet_names, self.include_headers)
 
-        # Initialize state
-        initial_state: AgentState = {
-            "messages": [HumanMessage(content=prompt)],
-            "excel_reader": self.excel_reader,
-            "sheet_names": self.sheet_names,
-            "include_headers": self.include_headers,
-        }
-
-        # Run the graph
-        final_state = self.graph.invoke(initial_state)
+        # Run the agent
+        final_state = self.agent.invoke({"messages": [HumanMessage(content=prompt)]})
 
         # Extract the final response and structure it
         last_message = final_state["messages"][-1]
