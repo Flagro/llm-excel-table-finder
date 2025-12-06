@@ -28,7 +28,7 @@ def get_excel_reader(file_path: str) -> ExcelReaderBase:
     """
     file_ext = Path(file_path).suffix.lower()
 
-    if file_ext == ".xlsx":
+    if file_ext in [".xlsx", ".xlsm"]:
         return OpenpyxlReader(file_path)
     elif file_ext == ".xls":
         return XlrdReader(file_path)
