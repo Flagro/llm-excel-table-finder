@@ -127,6 +127,11 @@ def export_to_csv(
     default="gpt-4o-mini",
     help="OpenAI model to use for the agent (default: gpt-4o-mini).",
 )
+@click.option(
+    "--api-key",
+    envvar="OPENAI_API_KEY",
+    help="OpenAI API key (defaults to OPENAI_API_KEY environment variable).",
+)
 def main(
     file_path: str,
     sheet: tuple,
@@ -134,6 +139,7 @@ def main(
     output: Optional[str],
     include_headers: bool,
     model: str,
+    api_key: Optional[str],
 ):
     """
     Excel Table Finder - Find tables in Excel files using AI.
@@ -156,10 +162,13 @@ def main(
     """
     try:
         # Validate OpenAI API key
-        if not os.getenv("OPENAI_API_KEY"):
-            click.echo("Error: OPENAI_API_KEY environment variable is not set.", err=True)
-            click.echo("\nPlease set your OpenAI API key:", err=True)
-            click.echo("  export OPENAI_API_KEY='your-api-key-here'", err=True)
+        if not api_key:
+            click.echo("Error: OpenAI API key is not provided.", err=True)
+            click.echo("\nPlease provide your OpenAI API key either:", err=True)
+            click.echo(
+                "  1. Via environment variable: export OPENAI_API_KEY='your-api-key-here'", err=True
+            )
+            click.echo("  2. Via command line option: --api-key your-api-key-here", err=True)
             sys.exit(1)
 
         # Validate options
@@ -180,6 +189,7 @@ def main(
             sheet_names=sheet_names,
             model_name=model,
             include_headers=include_headers or csv,  # Always include headers for CSV
+            api_key=api_key,
         )
 
         result = agent.find_tables()

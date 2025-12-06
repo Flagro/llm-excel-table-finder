@@ -63,6 +63,7 @@ class ExcelTableFinderAgent:
         sheet_names: Optional[List[str]] = None,
         model_name: str = "gpt-4o-mini",
         include_headers: bool = False,
+        api_key: Optional[str] = None,
     ):
         """
         Initialize the Excel table finder agent.
@@ -72,6 +73,7 @@ class ExcelTableFinderAgent:
             sheet_names: List of sheet names to analyze (None = all sheets)
             model_name: Name of the LLM model to use
             include_headers: Whether to extract headers and separate data ranges
+            api_key: OpenAI API key (if not provided, uses OPENAI_API_KEY environment variable)
         """
         self.excel_reader = excel_reader
         self.include_headers = include_headers
@@ -83,7 +85,7 @@ class ExcelTableFinderAgent:
             self.sheet_names = sheet_names
 
         # Initialize LLM
-        self.llm = ChatOpenAI(model=model_name, temperature=0)
+        self.llm = ChatOpenAI(model=model_name, temperature=0, api_key=api_key)
 
         # Create tools
         self.tools = self._create_tools()
