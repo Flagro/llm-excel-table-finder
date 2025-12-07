@@ -97,6 +97,32 @@ class ExcelTableFinderAgent:
         """Create the tools for the agent."""
 
         @tool
+        def get_sheet_preview(sheet_name: str, max_rows: int = 10, max_cols: int = 10) -> str:
+            """
+            Get a quick preview of the sheet (useful for initial exploration).
+            Returns first N rows and columns to understand sheet structure without loading the entire sheet.
+
+            Args:
+                sheet_name: Name of the sheet to preview
+                max_rows: Maximum number of rows to include in preview (default 10)
+                max_cols: Maximum number of columns to include in preview (default 10)
+
+            Returns:
+                JSON string with preview cells including addresses, values, and formatting
+            """
+            cells = self.excel_reader.get_sheet_preview(sheet_name, max_rows, max_cols)
+            result = []
+            for cell in cells:
+                result.append(
+                    {
+                        "address": cell.address,
+                        "value": str(cell.value) if cell.value is not None else "",
+                        "formatting": cell.formatting,
+                    }
+                )
+            return str(result)
+
+        @tool
         def get_sheet_bounds(sheet_name: str) -> str:
             """
             Get the boundaries of a sheet in Excel notation.
@@ -162,7 +188,7 @@ class ExcelTableFinderAgent:
                 )
             return str(result)
 
-        return [get_sheet_bounds, get_cells_in_range, iterate_until_empty]
+        return [get_sheet_preview, get_sheet_bounds, get_cells_in_range, iterate_until_empty]
 
     def find_tables(self) -> TablesOutput | TablesWithHeadersOutput:
         """

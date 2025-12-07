@@ -19,10 +19,11 @@ A table typically has:
 - Consistent structure across rows
 - Empty cells or different content around its boundaries
 
-Use the available tools to:
-1. Get the bounds of each sheet to understand the data area
-2. Get cells in ranges to see values and formatting
-3. Iterate in directions to find table boundaries
+RECOMMENDED STRATEGY:
+1. Start with get_sheet_preview for each sheet to quickly see the first 10x10 cells
+2. Use get_sheet_bounds to understand the full data area
+3. Use get_cells_in_range for detailed inspection of specific regions
+4. Use iterate_until_empty to find exact table boundaries
 
 After analyzing the sheets, provide your findings as structured output with:
 - Sheet name
@@ -44,10 +45,11 @@ A table is a rectangular region of cells that contains structured data, typicall
 - Consistent columns
 - Empty cells or different content around its boundaries
 
-Use the available tools to:
-1. Get the bounds of each sheet to understand the data area
-2. Get cells in ranges to see values and formatting
-3. Iterate in directions to find table boundaries
+RECOMMENDED STRATEGY:
+1. Start with get_sheet_preview for each sheet to quickly see the first 10x10 cells
+2. Use get_sheet_bounds to understand the full data area
+3. Use get_cells_in_range for detailed inspection of specific regions
+4. Use iterate_until_empty to find exact table boundaries
 
 After analyzing the sheets, provide your findings as structured output with:
 - Sheet name
