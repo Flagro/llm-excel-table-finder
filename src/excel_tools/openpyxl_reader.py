@@ -105,6 +105,32 @@ class OpenpyxlReader(ExcelReaderBase):
 
         return cells
 
+    def get_sheet_preview(
+        self, sheet_name: str, max_rows: int = 10, max_cols: int = 10
+    ) -> List[CellData]:
+        """Get a preview of the sheet (first N rows and columns)."""
+        sheet = self.workbook[sheet_name]
+
+        # Determine actual preview bounds
+        preview_rows = min(max_rows, sheet.max_row) if sheet.max_row else 0
+        preview_cols = min(max_cols, sheet.max_column) if sheet.max_column else 0
+
+        if preview_rows == 0 or preview_cols == 0:
+            return []
+
+        cells = []
+        for row in range(1, preview_rows + 1):  # openpyxl uses 1-indexed
+            for col in range(1, preview_cols + 1):
+                cell = sheet.cell(row, col)
+                address = self._get_column_letter(col) + str(row)
+
+                # Extract formatting information
+                formatting = self._get_cell_formatting(cell)
+
+                cells.append(CellData(address=address, value=cell.value, formatting=formatting))
+
+        return cells
+
     def close(self):
         """Close the workbook and free resources."""
         self.workbook.close()

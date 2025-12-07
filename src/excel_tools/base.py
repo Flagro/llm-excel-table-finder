@@ -142,6 +142,23 @@ class ExcelReaderBase(ABC):
         pass
 
     @abstractmethod
+    def get_sheet_preview(
+        self, sheet_name: str, max_rows: int = 10, max_cols: int = 10
+    ) -> List[CellData]:
+        """
+        Get a preview of the sheet (first N rows and columns).
+
+        Args:
+            sheet_name: Name of the sheet
+            max_rows: Maximum number of rows to preview (default 10)
+            max_cols: Maximum number of columns to preview (default 10)
+
+        Returns:
+            List of CellData objects for the preview region
+        """
+        pass
+
+    @abstractmethod
     def close(self):
         """Close the workbook and free resources."""
         pass

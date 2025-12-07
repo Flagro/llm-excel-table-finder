@@ -103,6 +103,32 @@ class XlrdReader(ExcelReaderBase):
 
         return cells
 
+    def get_sheet_preview(
+        self, sheet_name: str, max_rows: int = 10, max_cols: int = 10
+    ) -> List[CellData]:
+        """Get a preview of the sheet (first N rows and columns)."""
+        sheet = self.workbook.sheet_by_name(sheet_name)
+
+        # Determine actual preview bounds
+        preview_rows = min(max_rows, sheet.nrows)
+        preview_cols = min(max_cols, sheet.ncols)
+
+        cells = []
+        for row in range(preview_rows):
+            for col in range(preview_cols):
+                cell = sheet.cell(row, col)
+                address = CellRange.to_column_letter(col) + str(row + 1)
+
+                # Extract formatting information
+                formatting = self._get_cell_formatting(sheet, row, col)
+
+                # Get cell value
+                value = self._get_cell_value(cell)
+
+                cells.append(CellData(address=address, value=value, formatting=formatting))
+
+        return cells
+
     def close(self):
         """Close the workbook and free resources."""
         # xlrd doesn't require explicit closing, but we set to None for consistency
