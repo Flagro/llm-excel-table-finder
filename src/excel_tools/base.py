@@ -159,6 +159,20 @@ class ExcelReaderBase(ABC):
         pass
 
     @abstractmethod
+    def get_last_non_empty_cell_in_column(self, sheet_name: str, column: str) -> CellData | None:
+        """
+        Find the last non-empty cell in a column.
+
+        Args:
+            sheet_name: Name of the sheet
+            column: Column letter (e.g., "A", "B", "AA")
+
+        Returns:
+            CellData object for the last non-empty cell, or None if column is empty
+        """
+        pass
+
+    @abstractmethod
     def close(self):
         """Close the workbook and free resources."""
         pass

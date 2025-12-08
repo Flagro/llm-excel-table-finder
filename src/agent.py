@@ -188,7 +188,37 @@ class ExcelTableFinderAgent:
                 )
             return str(result)
 
-        return [get_sheet_preview, get_sheet_bounds, get_cells_in_range, iterate_until_empty]
+        @tool
+        def get_last_non_empty_cell_in_column(sheet_name: str, column: str) -> str:
+            """
+            Find the last non-empty cell in a column (useful for determining table boundaries).
+
+            Args:
+                sheet_name: Name of the sheet
+                column: Column letter (e.g., "A", "B", "AA")
+
+            Returns:
+                JSON string with the last non-empty cell data, or empty if column is empty
+            """
+            cell = self.excel_reader.get_last_non_empty_cell_in_column(sheet_name, column)
+            if cell is None:
+                return str({"message": "Column is empty or does not exist"})
+
+            return str(
+                {
+                    "address": cell.address,
+                    "value": str(cell.value) if cell.value is not None else "",
+                    "formatting": cell.formatting,
+                }
+            )
+
+        return [
+            get_sheet_preview,
+            get_sheet_bounds,
+            get_cells_in_range,
+            iterate_until_empty,
+            get_last_non_empty_cell_in_column,
+        ]
 
     def find_tables(self) -> TablesOutput | TablesWithHeadersOutput:
         """

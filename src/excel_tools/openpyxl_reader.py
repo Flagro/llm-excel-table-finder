@@ -131,6 +131,25 @@ class OpenpyxlReader(ExcelReaderBase):
 
         return cells
 
+    def get_last_non_empty_cell_in_column(self, sheet_name: str, column: str) -> CellData | None:
+        """Find the last non-empty cell in a column."""
+        sheet = self.workbook[sheet_name]
+
+        # Convert column letter to index
+        from openpyxl.utils import column_index_from_string
+
+        col_idx = column_index_from_string(column)
+
+        # Iterate from max_row down to 1 to find last non-empty cell
+        for row in range(sheet.max_row, 0, -1):
+            cell = sheet.cell(row, col_idx)
+            if cell.value is not None and str(cell.value).strip() != "":
+                address = column + str(row)
+                formatting = self._get_cell_formatting(cell)
+                return CellData(address=address, value=cell.value, formatting=formatting)
+
+        return None
+
     def close(self):
         """Close the workbook and free resources."""
         self.workbook.close()
