@@ -151,6 +151,26 @@ class XlrdReader(ExcelReaderBase):
 
         return None
 
+    def get_last_non_empty_cell_in_row(self, sheet_name: str, row: int) -> CellData | None:
+        """Find the last non-empty cell in a row."""
+        sheet = self.workbook.sheet_by_name(sheet_name)
+
+        # Convert to 0-indexed and check if row is within bounds
+        row_idx = row - 1
+        if row_idx < 0 or row_idx >= sheet.nrows:
+            return None
+
+        # Iterate from last column left to find last non-empty cell
+        for col in range(sheet.ncols - 1, -1, -1):
+            cell = sheet.cell(row_idx, col)
+            value = self._get_cell_value(cell)
+            if value is not None and str(value).strip() != "":
+                address = CellRange.to_column_letter(col) + str(row)
+                formatting = self._get_cell_formatting(sheet, row_idx, col)
+                return CellData(address=address, value=value, formatting=formatting)
+
+        return None
+
     def close(self):
         """Close the workbook and free resources."""
         # xlrd doesn't require explicit closing, but we set to None for consistency

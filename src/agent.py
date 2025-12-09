@@ -212,12 +212,37 @@ class ExcelTableFinderAgent:
                 }
             )
 
+        @tool
+        def get_last_non_empty_cell_in_row(sheet_name: str, row: int) -> str:
+            """
+            Find the last non-empty cell in a row (useful for determining table boundaries).
+
+            Args:
+                sheet_name: Name of the sheet
+                row: Row number (1-indexed, e.g., 1, 2, 3)
+
+            Returns:
+                JSON string with the last non-empty cell data, or empty if row is empty
+            """
+            cell = self.excel_reader.get_last_non_empty_cell_in_row(sheet_name, row)
+            if cell is None:
+                return str({"message": "Row is empty or does not exist"})
+
+            return str(
+                {
+                    "address": cell.address,
+                    "value": str(cell.value) if cell.value is not None else "",
+                    "formatting": cell.formatting,
+                }
+            )
+
         return [
             get_sheet_preview,
             get_sheet_bounds,
             get_cells_in_range,
             iterate_until_empty,
             get_last_non_empty_cell_in_column,
+            get_last_non_empty_cell_in_row,
         ]
 
     def find_tables(self) -> TablesOutput | TablesWithHeadersOutput:

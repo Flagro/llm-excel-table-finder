@@ -150,6 +150,24 @@ class OpenpyxlReader(ExcelReaderBase):
 
         return None
 
+    def get_last_non_empty_cell_in_row(self, sheet_name: str, row: int) -> CellData | None:
+        """Find the last non-empty cell in a row."""
+        sheet = self.workbook[sheet_name]
+
+        # Check if row is within bounds
+        if row < 1 or row > sheet.max_row:
+            return None
+
+        # Iterate from max_column left to 1 to find last non-empty cell
+        for col in range(sheet.max_column, 0, -1):
+            cell = sheet.cell(row, col)
+            if cell.value is not None and str(cell.value).strip() != "":
+                address = self._get_column_letter(col) + str(row)
+                formatting = self._get_cell_formatting(cell)
+                return CellData(address=address, value=cell.value, formatting=formatting)
+
+        return None
+
     def close(self):
         """Close the workbook and free resources."""
         self.workbook.close()
