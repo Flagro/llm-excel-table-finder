@@ -1,14 +1,13 @@
 """CLI interface for the Excel table finder agent."""
 
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Optional
 import click
 
 from src.agent import ExcelTableFinderAgent
-from src.excel_tools import OpenpyxlReader, XlrdReader, ExcelReaderBase
+from src.excel_tools import OpenpyxlReader, XlrdReader, PyxlsbReader, ExcelReaderBase
 from src.agent import TablesOutput, TablesWithHeadersOutput
 
 
@@ -32,8 +31,12 @@ def get_excel_reader(file_path: str) -> ExcelReaderBase:
         return OpenpyxlReader(file_path)
     elif file_ext == ".xls":
         return XlrdReader(file_path)
+    elif file_ext == ".xlsb":
+        return PyxlsbReader(file_path)
     else:
-        raise ValueError(f"Unsupported file extension: {file_ext}. Supported: .xlsx, .xls")
+        raise ValueError(
+            f"Unsupported file extension: {file_ext}. Supported: .xlsx, .xlsm, .xls, .xlsb"
+        )
 
 
 def export_to_csv(
@@ -144,7 +147,7 @@ def main(
     """
     Excel Table Finder - Find tables in Excel files using AI.
 
-    FILE_PATH: Path to the Excel file (.xlsx or .xls)
+    FILE_PATH: Path to the Excel file (.xlsx, .xlsm, .xls, or .xlsb)
 
     Examples:
 
@@ -216,6 +219,8 @@ def main(
             click.echo("  pip install openpyxl", err=True)
         elif "xlrd" in str(e):
             click.echo("  pip install xlrd", err=True)
+        elif "pyxlsb" in str(e):
+            click.echo("  pip install pyxlsb", err=True)
         sys.exit(1)
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
