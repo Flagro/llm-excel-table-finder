@@ -135,6 +135,12 @@ def export_to_csv(
     envvar="OPENAI_API_KEY",
     help="OpenAI API key (defaults to OPENAI_API_KEY environment variable).",
 )
+@click.option(
+    "--max-recursion",
+    type=int,
+    default=25,
+    help="Maximum number of tool call iterations for the agent (default: 25).",
+)
 def main(
     file_path: str,
     sheet: tuple,
@@ -143,6 +149,7 @@ def main(
     include_headers: bool,
     model: str,
     api_key: Optional[str],
+    max_recursion: int,
 ):
     """
     Excel Table Finder - Find tables in Excel files using AI.
@@ -162,6 +169,9 @@ def main(
 
         # Get tables with headers
         excel-table-finder myfile.xlsx --include-headers
+
+        # Limit the number of tool calls
+        excel-table-finder myfile.xlsx --max-recursion 15
     """
     try:
         # Validate OpenAI API key
@@ -193,6 +203,7 @@ def main(
             model_name=model,
             include_headers=include_headers or csv,  # Always include headers for CSV
             api_key=api_key,
+            max_recursion=max_recursion,
         )
 
         result = agent.find_tables()
