@@ -64,6 +64,7 @@ class ExcelTableFinderAgent:
         model_name: str = "gpt-4o-mini",
         include_headers: bool = False,
         api_key: Optional[str] = None,
+        max_recursion: int = 25,
     ):
         """
         Initialize the Excel table finder agent.
@@ -74,9 +75,11 @@ class ExcelTableFinderAgent:
             model_name: Name of the LLM model to use
             include_headers: Whether to extract headers and separate data ranges
             api_key: OpenAI API key (if not provided, uses OPENAI_API_KEY environment variable)
+            max_recursion: Maximum number of iterations for the agent (default: 25)
         """
         self.excel_reader = excel_reader
         self.include_headers = include_headers
+        self.max_recursion = max_recursion
 
         # Get sheet names to analyze
         if sheet_names is None or len(sheet_names) == 0:
@@ -255,8 +258,11 @@ class ExcelTableFinderAgent:
         # Create the initial prompt
         prompt = get_table_finding_prompt(self.sheet_names, self.include_headers)
 
-        # Run the agent
-        final_state = self.agent.invoke({"messages": [HumanMessage(content=prompt)]})
+        # Run the agent with recursion limit
+        final_state = self.agent.invoke(
+            {"messages": [HumanMessage(content=prompt)]},
+            config={"recursion_limit": self.max_recursion},
+        )
 
         # Extract the final response and structure it
         last_message = final_state["messages"][-1]
