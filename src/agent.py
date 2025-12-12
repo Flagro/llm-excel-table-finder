@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 
 from src.excel_tools import ExcelReaderBase, Direction
@@ -261,7 +262,7 @@ class ExcelTableFinderAgent:
         # Run the agent with recursion limit
         final_state = self.agent.invoke(
             {"messages": [HumanMessage(content=prompt)]},
-            config={"recursion_limit": self.max_recursion},
+            config=RunnableConfig(recursion_limit=self.max_recursion),
         )
 
         # Extract the final response and structure it
