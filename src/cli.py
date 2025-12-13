@@ -109,7 +109,7 @@ def export_to_csv(
     "--sheet",
     "-s",
     multiple=True,
-    help="Sheet name(s) to analyze. Can be specified multiple times. If not provided, all sheets are analyzed.",
+    help="Sheet name(s) to analyze. Can be specified multiple times. Use quotes for names with spaces. If not provided, all sheets are analyzed.",
 )
 @click.option(
     "--csv", is_flag=True, help="Export found tables to CSV files instead of returning JSON."
@@ -163,6 +163,9 @@ def main(
 
         # Find tables in specific sheets
         excel-table-finder myfile.xlsx -s Sheet1 -s Sheet2
+
+        # Find tables in sheets with spaces in names (use quotes)
+        excel-table-finder myfile.xlsx -s "Sales Data" -s "Monthly Report"
 
         # Export tables to CSV
         excel-table-finder myfile.xlsx --csv -o output.csv
