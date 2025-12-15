@@ -1,8 +1,12 @@
 """Excel reader implementation for .xls files using xlrd."""
 
+import logging
 from typing import List, Dict, Any
 
 from src.excel_tools.base import ExcelReaderBase, CellData, CellRange, Direction
+
+
+logger = logging.getLogger(__name__)
 
 
 class XlrdReader(ExcelReaderBase):
@@ -231,6 +235,6 @@ class XlrdReader(ExcelReaderBase):
 
         except (AttributeError, IndexError, KeyError):
             # If we can't get formatting info, just return empty dict
-            pass
+            logger.warning("Failed to get formatting information for cell %s", cell.address)
 
         return formatting

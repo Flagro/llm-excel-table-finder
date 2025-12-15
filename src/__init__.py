@@ -15,8 +15,6 @@ from src.agent import (
     TablesWithHeadersOutput,
 )
 
-__version__ = "0.1.0"
-
 __all__ = [
     "ExcelReaderBase",
     "CellData",
